@@ -1,0 +1,19 @@
+name: MERN Application CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test-workflow:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Verify CI workflow
+        run: |
+          echo "Hello Shiva!"
+          echo "GitHub Actions CI workflow is running successfully."
