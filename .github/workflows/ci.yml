@@ -6,14 +6,31 @@ on:
       - main
 
 jobs:
-  test-workflow:
+
+  docker-build:
+
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Verify CI workflow
+      - name: Build backend Docker image
         run: |
-          echo "Hello Shiva!"
-          echo "GitHub Actions CI workflow is running successfully."
+          docker build \
+            -t mern-ecommerce-backend:${{ github.sha }} \
+            ./backend
+
+      - name: Build frontend Docker image
+        run: |
+          docker build \
+            -t mern-ecommerce-frontend:${{ github.sha }} \
+            ./frontend
+
+      - name: Verify Docker images
+        run: docker images
+
+
+
+       
