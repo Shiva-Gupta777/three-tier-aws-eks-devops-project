@@ -156,7 +156,7 @@ REACT_APP_BASE_URL="http://localhost:8000"
   pass: helloWorld@123
 ```
 
-- **Please Note**: While the demo account provides a convenient way to explore many features, it has some limitations:
+- **Please Note**: While the demo account provides a convenient way to explore many features as well, it has some limitations:
     - **Password Reset and OTP Verification**: Due to security reasons, the demo account uses a non-real email address. Therefore, password reset and OTP verification functionalities are not available for this account.
 
     **What this means**:
