@@ -1,4 +1,4 @@
-name: Test OIDC Debug
+name: OIDC Token Debug
 
 on:
   workflow_dispatch:
@@ -12,7 +12,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Get OIDC Token
+        run: |
+          echo "Request URL:"
+          echo "$ACTIONS_ID_TOKEN_REQUEST_URL"
 
-      - name: Print OIDC Claims
-        uses: github/actions-oidc-debugger@main
+          TOKEN=$(curl -s \
+            -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=sts.amazonaws.com" \
+            | jq -r '.value')
+
+          echo "JWT received."
+
+          PAYLOAD=$(echo "$TOKEN" | cut -d "." -f2)
+
+          echo "$PAYLOAD" | base64 -d
