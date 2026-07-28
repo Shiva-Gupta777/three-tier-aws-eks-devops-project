@@ -15,69 +15,43 @@ env:
   FRONTEND_REPOSITORY: mern-ecommerce-frontend
 
 jobs:
-
   docker-build:
-
     runs-on: ubuntu-latest
 
     steps:
-
-      # Get source code
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      # Authenticate GitHub with AWS using OIDC
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::876762733183:role/GitHubActionsECRRole
           aws-region: ${{ env.AWS_REGION }}
 
-      # Useful verification while learning/debugging
-      - name: Verify AWS Identity
-        run: aws sts get-caller-identity
-
-      # Authenticate Docker with Amazon ECR
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      # Build Backend
       - name: Build backend Docker image
         run: |
           docker build \
-            -t ${{ env.BACKEND_REPOSITORY }}:${{ github.sha }} \
+            -t ${{ steps.login-ecr.outputs.registry }}/${{ env.BACKEND_REPOSITORY }}:${{ github.sha }} \
+            -t ${{ steps.login-ecr.outputs.registry }}/${{ env.BACKEND_REPOSITORY }}:latest \
             ./backend
 
-      # Build Frontend
       - name: Build frontend Docker image
         run: |
           docker build \
-            -t ${{ env.FRONTEND_REPOSITORY }}:${{ github.sha }} \
+            -t ${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:${{ github.sha }} \
+            -t ${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:latest \
             ./frontend
 
-      # Give Backend image its ECR destination
-      - name: Tag backend image for ECR
-        run: |
-          docker tag \
-            ${{ env.BACKEND_REPOSITORY }}:${{ github.sha }} \
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.BACKEND_REPOSITORY }}:${{ github.sha }}
-
-      # Give Frontend image its ECR destination
-      - name: Tag frontend image for ECR
-        run: |
-          docker tag \
-            ${{ env.FRONTEND_REPOSITORY }}:${{ github.sha }} \
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:${{ github.sha }}
-
-      # Upload Backend
       - name: Push backend image to ECR
         run: |
-          docker push \
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.BACKEND_REPOSITORY }}:${{ github.sha }}
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.BACKEND_REPOSITORY }}:${{ github.sha }}
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.BACKEND_REPOSITORY }}:latest
 
-      # Upload Frontend
       - name: Push frontend image to ECR
         run: |
-          docker push \
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:${{ github.sha }}
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:${{ github.sha }}
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:latest
