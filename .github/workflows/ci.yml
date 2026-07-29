@@ -9,16 +9,24 @@ permissions:
   id-token: write
   contents: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 env:
   AWS_REGION: ap-south-1
   BACKEND_REPOSITORY: mern-ecommerce-backend
   FRONTEND_REPOSITORY: mern-ecommerce-frontend
 
 jobs:
-  docker-build:
+
+  build-and-push:
+
+    name: Build and Push Docker Images
+
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout source code
         uses: actions/checkout@v4
 
