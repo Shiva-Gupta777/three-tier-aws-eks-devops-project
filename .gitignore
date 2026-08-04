@@ -19,3 +19,18 @@ Thumbs.db
 # IDE files
 .vscode/
 .idea/
+
+# ===========================
+# Terraform
+# ===========================
+
+.terraform/
+**/.terraform/
+
+*.tfstate
+*.tfstate.*
+
+crash.log
+
+*.tfvars
+*.tfvars.jsongit rm --cached terraform/terraform.tfstate
