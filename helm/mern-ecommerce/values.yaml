@@ -1,0 +1,36 @@
+frontend:
+  replicaCount: 2
+
+  image:
+    repository: 475666096475.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-frontend
+    tag: v1
+    pullPolicy: IfNotPresent
+
+  service:
+    port: 3000
+    targetPort: 80
+
+
+# Now backend configuration
+
+backend:
+  replicaCount: 2
+  image:
+    repository: 475666096475.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-backend
+    tag: v1
+    pullPolicy: IfNotPresent
+
+  service:
+    port: 5000
+    targetPort: 5000
+
+#ingress configuration
+
+ingress:
+  enabled: true
+
+  className: alb
+
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
