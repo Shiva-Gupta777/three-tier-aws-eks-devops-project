@@ -1,4 +1,4 @@
-name: MERN Application CI
+name: MERN Application CI/CD
 
 on:
   push:
@@ -12,17 +12,17 @@ permissions:
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
+
 env:
   AWS_REGION: ap-south-1
+  EKS_CLUSTER_NAME: three-tier-eks-cluster
   BACKEND_REPOSITORY: mern-ecommerce-backend
   FRONTEND_REPOSITORY: mern-ecommerce-frontend
 
 jobs:
 
   build-and-push:
-
     name: Build and Push Docker Images
-
     runs-on: ubuntu-latest
 
     steps:
@@ -34,7 +34,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::103021623558:role/GitHubActionsECRRole
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ap-south-1
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -43,23 +43,71 @@ jobs:
       - name: Build backend Docker image
         run: |
           docker build \
-            -t ${{ steps.login-ecr.outputs.registry }}/${{ env.BACKEND_REPOSITORY }}:${{ github.sha }} \
-            -t ${{ steps.login-ecr.outputs.registry }}/${{ env.BACKEND_REPOSITORY }}:latest \
+            -t ${{ steps.login-ecr.outputs.registry }}/mern-ecommerce-backend:${{ github.sha }} \
+            -t ${{ steps.login-ecr.outputs.registry }}/mern-ecommerce-backend:latest \
             ./backend
 
       - name: Build frontend Docker image
         run: |
           docker build \
-            -t ${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:${{ github.sha }} \
-            -t ${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:latest \
+            -t ${{ steps.login-ecr.outputs.registry }}/mern-ecommerce-frontend:${{ github.sha }} \
+            -t ${{ steps.login-ecr.outputs.registry }}/mern-ecommerce-frontend:latest \
             ./frontend
 
       - name: Push backend image to ECR
         run: |
-          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.BACKEND_REPOSITORY }}:${{ github.sha }}
-          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.BACKEND_REPOSITORY }}:latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/mern-ecommerce-backend:${{ github.sha }}
+          docker push ${{ steps.login-ecr.outputs.registry }}/mern-ecommerce-backend:latest
 
       - name: Push frontend image to ECR
         run: |
-          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:${{ github.sha }}
-          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/mern-ecommerce-frontend:${{ github.sha }}
+          docker push ${{ steps.login-ecr.outputs.registry }}/mern-ecommerce-frontend:latest
+
+
+  deploy-to-eks:
+    name: Deploy Application to EKS
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::103021623558:role/GitHubActionsECRRole
+          aws-region: ap-south-1
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --region ap-south-1 \
+            --name three-tier-eks-cluster
+
+      - name: Verify EKS connection
+        run: |
+          kubectl get nodes
+
+      - name: Deploy backend to EKS
+        run: |
+          kubectl set image deployment/backend-deployment \
+            backend=103021623558.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-backend:${{ github.sha }}
+
+      - name: Deploy frontend to EKS
+        run: |
+          kubectl set image deployment/frontend-deployment \
+            frontend=103021623558.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-frontend:${{ github.sha }}
+
+      - name: Wait for backend rollout
+        run: |
+          kubectl rollout status deployment/backend-deployment
+
+      - name: Wait for frontend rollout
+        run: |
+          kubectl rollout status deployment/frontend-deployment
+
+      - name: Verify final deployment
+        run: |
+          kubectl get deployments
+          kubectl get pods
+          kubectl get ingress
