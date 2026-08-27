@@ -1,4 +1,4 @@
-name: MERN Application CI/CD
+name: Welcome to MERN Application CI/CD
 
 on:
   push:
