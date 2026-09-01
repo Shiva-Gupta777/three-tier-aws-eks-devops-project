@@ -42,11 +42,14 @@ server.use("/reviews",reviewRoutes)
 server.use("/wishlist",wishlistRoutes)
 
 
-
 server.get("/",(req,res)=>{
     res.status(200).json({message:'running'})
 })
 
+server.get("/health",(req,res)=>{
+    res.status(200).json({status:"ok"})
+})
+
 server.listen(8000,()=>{
-    console.log('server [STARTED] ~ http://localhost:8000');
+console.log('server [STARTED] ~ [http://localhost:8000](http://localhost:8000)');
 })
