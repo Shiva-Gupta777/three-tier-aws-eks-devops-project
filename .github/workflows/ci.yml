@@ -33,7 +33,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::103021623558:role/GitHubActionsECRRole
+          role-to-assume: arn:aws:iam::777724728331:role/GitHubActionsECRRole
           aws-region: ap-south-1
 
       - name: Login to Amazon ECR
@@ -75,7 +75,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::103021623558:role/GitHubActionsECRRole
+          role-to-assume: arn:aws:iam::777724728331:role/GitHubActionsECRRole
           aws-region: ap-south-1
 
       - name: Update kubeconfig
@@ -91,12 +91,12 @@ jobs:
       - name: Deploy backend to EKS
         run: |
           kubectl set image deployment/backend-deployment \
-            backend=103021623558.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-backend:${{ github.sha }}
+            backend=777724728331.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-backend:${{ github.sha }}
 
       - name: Deploy frontend to EKS
         run: |
           kubectl set image deployment/frontend-deployment \
-            frontend=103021623558.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-frontend:${{ github.sha }}
+            frontend=777724728331.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-frontend:${{ github.sha }}
 
       - name: Wait for backend rollout
         run: |

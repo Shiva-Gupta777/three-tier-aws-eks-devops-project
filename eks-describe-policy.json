@@ -4,7 +4,7 @@
     {
       "Effect": "Allow",
       "Action": "eks:DescribeCluster",
-      "Resource": "arn:aws:eks:ap-south-1:103021623558:cluster/three-tier-eks-cluster"
+      "Resource": "arn:aws:eks:ap-south-1:777724728331:cluster/three-tier-eks-cluster"
     }
   ]
 }

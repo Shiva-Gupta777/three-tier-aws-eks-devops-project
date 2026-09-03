@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: 103021623558.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-backend:v1
+          image: 777724728331.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-backend:v1
           ports:
             - containerPort: 8000
           readinessProbe:
