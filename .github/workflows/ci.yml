@@ -72,6 +72,9 @@ jobs:
 
     steps:
 
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -87,6 +90,11 @@ jobs:
       - name: Verify EKS connection
         run: |
           kubectl get nodes
+
+      - name: Create or update Kubernetes deployments
+        run: |
+          kubectl apply -f k8s/backend-deployment.yaml
+          kubectl apply -f k8s/frontend-deployment.yaml
 
       - name: Deploy backend to EKS
         run: |
