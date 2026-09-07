@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+data:
+  PRODUCTION: "true"
+  LOGIN_TOKEN_EXPIRATION: "30d"
+  PASSWORD_RESET_TOKEN_EXPIRATION: "2m"
+  OTP_EXPIRATION_TIME: "300000"
+  COOKIE_EXPIRATION_DAYS: "30"
+  SMTP_HOST: "smtp-relay.brevo.com"
+  SMTP_PORT: "587"
+  SMTP_FROM: "shivagupta2249@gmail.com"
