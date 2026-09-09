@@ -15,7 +15,6 @@ concurrency:
 
 env:
   AWS_REGION: ap-south-1
-  EKS_CLUSTER_NAME: three-tier-eks-cluster
   BACKEND_REPOSITORY: mern-ecommerce-backend
   FRONTEND_REPOSITORY: mern-ecommerce-frontend
 
@@ -33,8 +32,8 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::777724728331:role/GitHubActionsECRRole
-          aws-region: ap-south-1
+          role-to-assume: arn:aws:iam::464878128082:role/GitHubActionsECRRole
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -43,79 +42,23 @@ jobs:
       - name: Build backend Docker image
         run: |
           docker build \
-            -t ${{ steps.login-ecr.outputs.registry }}/mern-ecommerce-backend:${{ github.sha }} \
-            -t ${{ steps.login-ecr.outputs.registry }}/mern-ecommerce-backend:latest \
+            -t ${{ steps.login-ecr.outputs.registry }}/${{ env.BACKEND_REPOSITORY }}:${{ github.sha }} \
+            -t ${{ steps.login-ecr.outputs.registry }}/${{ env.BACKEND_REPOSITORY }}:latest \
             ./backend
 
       - name: Build frontend Docker image
         run: |
           docker build \
-            -t ${{ steps.login-ecr.outputs.registry }}/mern-ecommerce-frontend:${{ github.sha }} \
-            -t ${{ steps.login-ecr.outputs.registry }}/mern-ecommerce-frontend:latest \
+            -t ${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:${{ github.sha }} \
+            -t ${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:latest \
             ./frontend
 
       - name: Push backend image to ECR
         run: |
-          docker push ${{ steps.login-ecr.outputs.registry }}/mern-ecommerce-backend:${{ github.sha }}
-          docker push ${{ steps.login-ecr.outputs.registry }}/mern-ecommerce-backend:latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.BACKEND_REPOSITORY }}:${{ github.sha }}
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.BACKEND_REPOSITORY }}:latest
 
       - name: Push frontend image to ECR
         run: |
-          docker push ${{ steps.login-ecr.outputs.registry }}/mern-ecommerce-frontend:${{ github.sha }}
-          docker push ${{ steps.login-ecr.outputs.registry }}/mern-ecommerce-frontend:latest
-
-
-  deploy-to-eks:
-    name: Deploy Application to EKS
-    needs: build-and-push
-    runs-on: ubuntu-latest
-
-    steps:
-
-      - name: Checkout source code
-        uses: actions/checkout@v4
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::777724728331:role/GitHubActionsECRRole
-          aws-region: ap-south-1
-
-      - name: Update kubeconfig
-        run: |
-          aws eks update-kubeconfig \
-            --region ap-south-1 \
-            --name three-tier-eks-cluster
-
-      - name: Verify EKS connection
-        run: |
-          kubectl get nodes
-
-      - name: Create or update Kubernetes deployments
-        run: |
-          kubectl apply -f k8s/backend-deployment.yaml
-          kubectl apply -f k8s/frontend-deployment.yaml
-
-      - name: Deploy backend to EKS
-        run: |
-          kubectl set image deployment/backend-deployment \
-            backend=777724728331.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-backend:${{ github.sha }}
-
-      - name: Deploy frontend to EKS
-        run: |
-          kubectl set image deployment/frontend-deployment \
-            frontend=777724728331.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-frontend:${{ github.sha }}
-
-      - name: Wait for backend rollout
-        run: |
-          kubectl rollout status deployment/backend-deployment
-
-      - name: Wait for frontend rollout
-        run: |
-          kubectl rollout status deployment/frontend-deployment
-
-      - name: Verify final deployment
-        run: |
-          kubectl get deployments
-          kubectl get pods
-          kubectl get ingress
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:${{ github.sha }}
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:latest
