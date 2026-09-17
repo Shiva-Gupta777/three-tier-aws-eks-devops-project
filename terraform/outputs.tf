@@ -1,44 +1,34 @@
 output "vpc_id" {
   description = "ID of the project VPC"
-  value       = aws_vpc.main.id
+  value       = var.lab_enabled ? aws_vpc.main[0].id : null
 }
 
 output "public_subnet_ids" {
   description = "Public subnet IDs"
-  value = [
-    aws_subnet.public_1.id,
-    aws_subnet.public_2.id
-  ]
+
+  value = var.lab_enabled ? [
+    aws_subnet.public_1[0].id,
+    aws_subnet.public_2[0].id
+  ] : []
 }
 
 output "private_subnet_ids" {
   description = "Private subnet IDs"
-  value = [
-    aws_subnet.private_1.id,
-    aws_subnet.private_2.id
-  ]
-}
 
-// Output the EKS cluster name
+  value = var.lab_enabled ? [
+    aws_subnet.private_1[0].id,
+    aws_subnet.private_2[0].id
+  ] : []
+}
 
 output "eks_cluster_name" {
-
-  value = aws_eks_cluster.main.name
-
+  value = var.lab_enabled ? aws_eks_cluster.main[0].name : null
 }
-
-// Output the EKS cluster endpoint
 
 output "node_group_name" {
-
-  value = aws_eks_node_group.main.node_group_name
-
+  value = var.lab_enabled ? aws_eks_node_group.main[0].node_group_name : null
 }
 
-// Output the EKS cluster endpoint
-
 output "node_group_status" {
-
-  value = aws_eks_node_group.main.status
-
+  value = var.lab_enabled ? aws_eks_node_group.main[0].status : null
 }

@@ -11,3 +11,4 @@ data:
   SMTP_HOST: "smtp-relay.brevo.com"
   SMTP_PORT: "587"
   SMTP_FROM: "shivagupta2249@gmail.com"
+  ORIGIN: "http://k8s-default-frontend-1b975e9422-1815422969.ap-south-1.elb.amazonaws.com"

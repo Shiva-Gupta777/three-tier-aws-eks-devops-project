@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: backend-config
+
+data:
+  PRODUCTION: {{ .Values.backendConfig.PRODUCTION | quote }}
+
+  LOGIN_TOKEN_EXPIRATION: {{ .Values.backendConfig.LOGIN_TOKEN_EXPIRATION | quote }}
+
+  PASSWORD_RESET_TOKEN_EXPIRATION: {{ .Values.backendConfig.PASSWORD_RESET_TOKEN_EXPIRATION | quote }}
+
+  OTP_EXPIRATION_TIME: {{ .Values.backendConfig.OTP_EXPIRATION_TIME | quote }}
+
+  COOKIE_EXPIRATION_DAYS: {{ .Values.backendConfig.COOKIE_EXPIRATION_DAYS | quote }}
+
+  SMTP_HOST: {{ .Values.backendConfig.SMTP_HOST | quote }}
+
+  SMTP_PORT: {{ .Values.backendConfig.SMTP_PORT | quote }}
+
+  SMTP_FROM: {{ .Values.backendConfig.SMTP_FROM | quote }}
+
+  ORIGIN: {{ .Values.backendConfig.ORIGIN | quote }}

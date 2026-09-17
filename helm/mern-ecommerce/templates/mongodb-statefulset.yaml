@@ -1,0 +1,57 @@
+{{- if .Values.mongodb.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo
+spec:
+  serviceName: mongo
+  replicas: {{ .Values.mongodb.replicaCount }}
+
+  selector:
+    matchLabels:
+      app: mongo
+
+  template:
+    metadata:
+      labels:
+        app: mongo
+
+    spec:
+      containers:
+        - name: mongo
+          image: "{{ .Values.mongodb.image.repository }}:{{ .Values.mongodb.image.tag }}"
+          imagePullPolicy: {{ .Values.mongodb.image.pullPolicy }}
+
+          ports:
+            - name: mongodb
+              containerPort: {{ .Values.mongodb.service.port }}
+
+          volumeMounts:
+            - name: mongo-data
+              mountPath: /data/db
+
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.mongodb.service.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.mongodb.service.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 20
+
+  {{- if .Values.mongodb.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: mongo-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: {{ .Values.mongodb.persistence.storageClass }}
+        resources:
+          requests:
+            storage: {{ .Values.mongodb.persistence.size }}
+  {{- end }}
+{{- end }}

@@ -1,32 +1,78 @@
 frontend:
   replicaCount: 2
-
   image:
-    repository: 777724728331.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-frontend
-    tag: v1
-    pullPolicy: IfNotPresent
-
+    repository: 464878128082.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-frontend
+    tag: latest
+    pullPolicy: Always
   service:
     port: 3000
     targetPort: 80
 
 backend:
   replicaCount: 2
-
   image:
-    repository: 777724728331.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-backend
-    tag: v1
-    pullPolicy: IfNotPresent
-
+    repository: 464878128082.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-backend
+    tag: latest
+    pullPolicy: Always
   service:
     port: 8000
     targetPort: 8000
 
+backendConfig:
+  PRODUCTION: "true"
+  LOGIN_TOKEN_EXPIRATION: "30d"
+  PASSWORD_RESET_TOKEN_EXPIRATION: "2m"
+  OTP_EXPIRATION_TIME: "300000"
+  COOKIE_EXPIRATION_DAYS: "30"
+  SMTP_HOST: "smtp-relay.brevo.com"
+  SMTP_PORT: "587"
+  SMTP_FROM: "shivagupta2249@gmail.com"
+  ORIGIN: "http://k8s-default-frontend-1b975e9422-929247533.ap-south-1.elb.amazonaws.com"
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  averageUtilization: 70
+
+pdb:
+  enabled: true
+  minAvailable: 1
+
 ingress:
   enabled: true
-
   className: alb
-
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
+  backendPaths:
+    - /auth
+    - /users
+    - /products
+    - /orders
+    - /cart
+    - /brands
+    - /categories
+    - /address
+    - /reviews
+    - /wishlist
+    - /health
+
+
+mongodb:
+  enabled: true
+
+  replicaCount: 1
+
+  image:
+    repository: mongo
+    tag: "7"
+    pullPolicy: IfNotPresent
+
+  service:
+    port: 27017
+
+  persistence:
+    enabled: true
+    storageClass: gp2
+    size: 5Gi
