@@ -27,7 +27,7 @@ backendConfig:
   SMTP_HOST: "smtp-relay.brevo.com"
   SMTP_PORT: "587"
   SMTP_FROM: "shivagupta2249@gmail.com"
-  ORIGIN: "http://k8s-default-frontend-1b975e9422-929247533.ap-south-1.elb.amazonaws.com"
+  ORIGIN: "http://k8s-default-frontend-1b975e9422-719455836.ap-south-1.elb.amazonaws.com"
 
 autoscaling:
   enabled: true
