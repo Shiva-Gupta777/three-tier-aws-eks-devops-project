@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: 464878128082.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-backend:latest
+        image: 270254976624.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-backend:latest
 
         envFrom:
         - configMapRef:

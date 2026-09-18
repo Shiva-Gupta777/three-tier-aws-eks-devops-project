@@ -1,7 +1,7 @@
 frontend:
   replicaCount: 2
   image:
-    repository: 464878128082.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-frontend
+    repository: 270254976624.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-frontend
     tag: latest
     pullPolicy: Always
   service:
@@ -11,7 +11,7 @@ frontend:
 backend:
   replicaCount: 2
   image:
-    repository: 464878128082.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-backend
+    repository: 270254976624.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-backend
     tag: latest
     pullPolicy: Always
   service:

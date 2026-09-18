@@ -21,7 +21,7 @@ spec:
       containers:
         - name: frontend
 
-          image: 464878128082.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-frontend:latest
+          image: 270254976624.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-frontend:latest
 
           ports:
             - containerPort: 80
