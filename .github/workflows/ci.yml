@@ -7,7 +7,7 @@ on:
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -20,7 +20,7 @@ env:
 
 jobs:
   build-and-push:
-    name: Build and Push Docker Images
+    name: Build, Push & GitOps Update
     runs-on: ubuntu-latest
 
     steps:
@@ -63,3 +63,70 @@ jobs:
         run: |
           docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:${{ github.sha }}
           docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_REPOSITORY }}:latest
+
+      - name: Update Helm image tags
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import os
+          import re
+
+          path = Path("helm/mern-ecommerce/values.yaml")
+          text = path.read_text()
+          tag = os.environ["IMAGE_TAG"]
+
+          def update_section(text, section, next_section):
+              pattern = rf"(?ms)^({section}:.*?)(?=^{next_section}:|\Z)"
+              match = re.search(pattern, text)
+
+              if not match:
+                  raise SystemExit(
+                      f"ERROR: Could not find section '{section}' before '{next_section}'"
+                  )
+
+              block = match.group(1)
+
+              updated, count = re.subn(
+                  r"(?m)^(\s*tag:\s*).*$",
+                  rf"\g<1>{tag}",
+                  block,
+                  count=1
+              )
+
+              if count != 1:
+                  raise SystemExit(
+                      f"ERROR: Could not find exactly one image tag in '{section}' section"
+                  )
+
+              return text[:match.start(1)] + updated + text[match.end(1):]
+
+          text = update_section(text, "frontend", "backend")
+          text = update_section(text, "backend", "mongodb")
+
+          path.write_text(text)
+          PY
+
+      - name: Show GitOps change
+        run: |
+          git diff -- helm/mern-ecommerce/values.yaml
+
+      - name: Validate Helm chart
+        run: |
+          helm lint helm/mern-ecommerce
+
+      - name: Commit and push GitOps update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add helm/mern-ecommerce/values.yaml
+
+          if git diff --cached --quiet; then
+            echo "No Helm image-tag changes detected."
+            exit 0
+          fi
+
+          git commit -m "[skip ci] Update Helm image tags to ${GITHUB_SHA}"
+          git push origin HEAD:main
