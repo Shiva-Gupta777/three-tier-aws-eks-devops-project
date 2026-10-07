@@ -1,8 +1,8 @@
 frontend:
   replicaCount: 2
   image:
-    repository: 270254976624.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-frontend
-    tag: 08e8fb3e8b5c958e33c5027363e1c397b13fa24a
+    repository: 007303174424.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-frontend
+    tag: latest
     pullPolicy: Always
   service:
     port: 3000
@@ -11,8 +11,8 @@ frontend:
 backend:
   replicaCount: 2
   image:
-    repository: 270254976624.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-backend
-    tag: 08e8fb3e8b5c958e33c5027363e1c397b13fa24a
+    repository: 007303174424.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-backend
+    tag: latest
     pullPolicy: Always
   service:
     port: 8000
@@ -58,10 +58,8 @@ ingress:
     - /wishlist
     - /health
 
-
 mongodb:
   enabled: true
-
   replicaCount: 1
 
   image:
