@@ -2,7 +2,7 @@ frontend:
   replicaCount: 2
   image:
     repository: 007303174424.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-frontend
-    tag: latest
+    tag: 822d8116c8aa8129319d5bdbb58f60bb7ea0ede7
     pullPolicy: Always
   service:
     port: 3000
@@ -12,7 +12,7 @@ backend:
   replicaCount: 2
   image:
     repository: 007303174424.dkr.ecr.ap-south-1.amazonaws.com/mern-ecommerce-backend
-    tag: latest
+    tag: 822d8116c8aa8129319d5bdbb58f60bb7ea0ede7
     pullPolicy: Always
   service:
     port: 8000
